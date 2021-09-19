@@ -9,6 +9,7 @@ import {
     Switch,
 } from "react-router-dom";
 import {Home} from "./features/home/Home";
+import {PUBLIC_URL} from "./constants";
 
 const ExampleApp = () => {
     return (
@@ -65,7 +66,7 @@ const ExampleApp = () => {
 
 function App() {
   return (
-      <Router basename={process.env.PUBLIC_URL}>
+      <Router basename={PUBLIC_URL}>
         <Switch>
             <Route exact path={["/", "/home"]} component={Home}/>
             <Route exact path="/example-app" component={ExampleApp} />

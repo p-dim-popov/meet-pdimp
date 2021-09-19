@@ -1,0 +1,1 @@
+export const PUBLIC_URL = window.location.origin === "https://pdimp.herokuapp.com" ? '/meet' : process.env.PUBLIC_URL;
