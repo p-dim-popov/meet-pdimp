@@ -14,13 +14,16 @@ export const Room: React.FC = () => {
         console.log('[Room]: Mounting/Changing room!', roomName)
         if (!roomName) return;
 
-        const domain = 'beta.meet.jit.si';
-        const _roomName = `pdimp_${encodeURIComponent(roomName)}`;
+        const domain = 'jitsi.riot.im';
+        const _roomName = `pdimp_${encodeURIComponent(roomName)}_pdimp`;
         const options = {
             roomName: _roomName,
             width: '100%',
             height: '100%',
-            parentNode: document.querySelector('#meet')
+            parentNode: document.querySelector('#meet'),
+            configOverwrite: {
+                disableDeepLinking: true,
+            }
         };
         console.log('[Room]: Room name ->', _roomName);
         const api = new JitsiManager.ExternalApiClass(domain, options);
@@ -34,8 +37,8 @@ export const Room: React.FC = () => {
             api?.dispose?.();
             api?.removeEventListener?.('readyToClose', goToHome);
         }
-    }, [roomName])
+    }, [history, roomName])
     return roomName
-        ? <div style={{ width: '99.4vw', height: '99.5vh' }} id="meet"/>
+        ? <div style={{ width: '100vw', height: '100vh', maxWidth: '100%', overflow: "hidden" }} id="meet"/>
         : null;
 };
