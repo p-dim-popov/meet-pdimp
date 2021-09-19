@@ -14,7 +14,7 @@ export const Room: React.FC = () => {
         console.log('[Room]: Mounting/Changing room!', roomName)
         if (!roomName) return;
 
-        const domain = 'jitsi.riot.im';
+        const domain = 'beta.meet.jit.si';
         const _roomName = `pdimp_${encodeURIComponent(roomName)}_pdimp`;
         const options = {
             roomName: _roomName,

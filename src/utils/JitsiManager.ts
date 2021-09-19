@@ -4,7 +4,7 @@ class JitsiManagerClass {
     // @ts-ignore
     ExternalApiClass: typeof JitsiExternalAPI;
     async loadExternalApi() {
-        await jsonPLoader.load('https://meet.jit.si/external_api.js');
+        await jsonPLoader.load('https://beta.meet.jit.si/external_api.js');
         // @ts-ignore
         this.ExternalApiClass = window.JitsiMeetExternalAPI;
         // @ts-ignore
