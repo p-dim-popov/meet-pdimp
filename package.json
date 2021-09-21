@@ -4,12 +4,11 @@
   "private": true,
   "author": {
     "name" : "Peter Popov",
-    "email" : "p.dim.popov@gmail.com",
-    "url" : "https://pdimp.herokuapp.com/"
+    "email" : "p.dim.popov@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/p-dim-popov/meet-pdimp.git"
+    "url": "git@github.com:p-dim-popov/meet-pdimp.git"
   },
   "homepage": "/meet-pdimp/",
   "dependencies": {
