@@ -3,13 +3,13 @@
 set -e
 
 CURRENT_BRANCH="$(git branch --show-current)"
-
+git clone "$(node -pe "require('./package.json').repository.url")" dist
+pushd dist
 git checkout main
-git pull
 git branch -D dist
 git checkout -b dist
 
-VERSION="$(node -pe 'require(`./package.json`).version')"
+VERSION="$(node -pe "require('./package.json').version")"
 
 echo "Building release for version $VERSION"
 yarn run build
@@ -30,5 +30,8 @@ git add .
 git commit -m "build(release): version $VERSION"
 git push --force --set-upstream origin dist
 git checkout "$CURRENT_BRANCH"
+
+popd
+rm -fr dist
 
 echo "Success!"
