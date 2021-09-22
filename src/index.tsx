@@ -6,6 +6,8 @@ import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import {JitsiManager} from "./utils/JitsiManager";
+import {Alert, CircularProgress } from '@mui/material';
+import { CenteredBox } from './components';
 
 console.log('[process.env.REACT_APP_DISABLE_LIVE_RELOAD]: ', process.env.REACT_APP_DISABLE_LIVE_RELOAD);
 if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
@@ -23,15 +25,41 @@ if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
     };
 }
 
+const root = document.getElementById('root');
+ReactDOM.render(
+    (
+        <React.StrictMode>
+            <CenteredBox>
+                <CircularProgress/>
+            </CenteredBox>
+        </React.StrictMode>
+    ),
+    root
+);
+
 JitsiManager.loadExternalApi()
     .then(() => {
         ReactDOM.render(
-            <React.StrictMode>
-                <Provider store={store}>
-                    <App />
-                </Provider>
-            </React.StrictMode>,
-            document.getElementById('root')
+            (
+                <React.StrictMode>
+                    <Provider store={store}>
+                        <App/>
+                    </Provider>
+                </React.StrictMode>
+            ),
+            root
+        );
+    })
+    .catch((error) => {
+        ReactDOM.render(
+            (
+                <React.StrictMode>
+                    <CenteredBox>
+                        <Alert severity="error">Jitsi could not load correctly!</Alert>
+                    </CenteredBox>
+                </React.StrictMode>
+            ),
+            root
         );
     })
 

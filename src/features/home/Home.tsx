@@ -1,7 +1,8 @@
 import React, {FormEvent, useCallback, useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import {Box, FilledInput, FormControl, InputLabel, Button} from "@mui/material";
+import {FilledInput, FormControl, InputLabel, Button} from "@mui/material";
 import {generateSlug} from "random-word-slugs";
+import {CenteredBox} from "../../components";
 
 export const Home: React.FC = () => {
     const history = useHistory();
@@ -44,13 +45,7 @@ export const Home: React.FC = () => {
 
     return (
         <form onSubmit={onSubmit}>
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                minHeight="100vh"
-                flexDirection="column"
-            >
+            <CenteredBox>
                     <FormControl focused>
                         <InputLabel htmlFor="component-outlined">Name</InputLabel>
                         <FilledInput
@@ -61,7 +56,7 @@ export const Home: React.FC = () => {
                         />
                     </FormControl>
                     <Button variant="contained" type="submit" >Start meeting</Button>
-            </Box>
+            </CenteredBox>
         </form>
     )
 };

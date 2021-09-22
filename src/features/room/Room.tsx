@@ -1,44 +1,61 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {JitsiManager} from "../../utils/JitsiManager";
 import {useHistory, useParams} from "react-router-dom";
+import {InviteDialog} from "../../components";
 
 export interface IRouteParams {
     roomName: string;
 }
 
-export const Room: React.FC = () => {
-    const { roomName } = useParams<IRouteParams>();
+const useJitsiExternalApi = (roomName: string, handlers: { [key: string]: Function } = {}) => {
     const history = useHistory();
 
     useEffect(() => {
         console.log('[Room]: Mounting/Changing room!', roomName)
         if (!roomName) return;
 
-        const domain = 'beta.meet.jit.si';
         const _roomName = `pdimp_${encodeURIComponent(roomName)}_pdimp`;
-        const options = {
-            roomName: _roomName,
-            width: '100%',
-            height: '100%',
-            parentNode: document.querySelector('#meet'),
-            configOverwrite: {
-                disableDeepLinking: true,
-            }
-        };
         console.log('[Room]: Room name ->', _roomName);
-        const api = new JitsiManager.ExternalApiClass(domain, options);
-        const goToHome = () => {
-            console.log('[Room]: Redirecting to home')
-            history.push('/');
-        }
-        api.addEventListener('readyToClose', goToHome);
+        const api = new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, JitsiManager.getExternalApiOptions(_roomName));
+        Object.entries(handlers).forEach(([key, value]) => api.addEventListener(key, value))
         return () => {
             console.log('[Room]: Unmounting/Room changing!')
             api?.dispose?.();
-            api?.removeEventListener?.('readyToClose', goToHome);
+            Object.entries(handlers).forEach(([key, value]) => api.removeEventListener(key, value))
         }
-    }, [history, roomName])
-    return roomName
-        ? <div style={{ width: '100vw', height: '100vh', maxWidth: '100%', overflow: "hidden" }} id="meet"/>
-        : null;
+    }, [handlers, history, roomName])
+}
+
+export const Room: React.FC = () => {
+    const { roomName } = useParams<IRouteParams>();
+    const history = useHistory();
+    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+    const [handlers] = useState({
+        readyToClose: () => {
+            console.log('[Room]: Redirecting to home')
+            history.push('/');
+        },
+        toolbarButtonClicked: ({ key }: { key: string }) => {
+            switch (key) {
+                case 'invite':
+                    setIsInviteDialogOpen(true);
+                    break;
+            }
+        },
+    });
+
+    useJitsiExternalApi(roomName, handlers);
+
+    if (!roomName) {
+        return <>Not in a room</>;
+    }
+    return (
+        <>
+            <InviteDialog isOpen={isInviteDialogOpen} setIsInviteDialogOpen={setIsInviteDialogOpen} />
+            <div
+                style={{width: '100vw', height: '100vh', maxWidth: '100%', overflow: "hidden"}}
+                id="meet"
+            />
+        </>
+    );
 };
