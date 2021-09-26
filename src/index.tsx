@@ -9,6 +9,8 @@ import {JitsiManager} from "./utils/JitsiManager";
 import {Alert, CircularProgress } from '@mui/material';
 import { CenteredBox } from './components';
 import {Helmet} from "react-helmet";
+import {version} from '../package.json'
+import styled from "@emotion/styled";
 
 declare global {
     interface Window {
@@ -33,17 +35,34 @@ if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
     };
 }
 
+const VersionFooter = styled("div")`
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  opacity: 0.5;
+  color: white;
+  mix-blend-mode: difference;
+`
+const AppBase: React.FC = (props) => {
+    return (
+        <React.StrictMode>
+            {props.children}
+            <VersionFooter>{version}</VersionFooter>
+        </React.StrictMode>
+    )
+}
+
 const root = document.getElementById('root');
 ReactDOM.render(
     (
-        <React.StrictMode>
+        <AppBase>
             <Helmet>
                 <title>{`Loading | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
             </Helmet>
             <CenteredBox>
                 <CircularProgress/>
             </CenteredBox>
-        </React.StrictMode>
+        </AppBase>
     ),
     root
 );
@@ -52,14 +71,14 @@ JitsiManager.loadExternalApi()
     .then(() => {
         ReactDOM.render(
             (
-                <React.StrictMode>
+                <AppBase>
                     <Helmet>
                         <title>{process.env.REACT_APP_DOCUMENT_TITLE_BASE}</title>
                     </Helmet>
                     <Provider store={store}>
                         <App/>
                     </Provider>
-                </React.StrictMode>
+                </AppBase>
             ),
             root
         );
@@ -67,14 +86,14 @@ JitsiManager.loadExternalApi()
     .catch((error) => {
         ReactDOM.render(
             (
-                <React.StrictMode>
+                <AppBase>
                     <Helmet>
                         <title>{`Error | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
                     </Helmet>
                     <CenteredBox>
                         <Alert severity="error">Jitsi could not load correctly!</Alert>
                     </CenteredBox>
-                </React.StrictMode>
+                </AppBase>
             ),
             root
         );
