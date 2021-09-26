@@ -8,6 +8,14 @@ import * as serviceWorker from './serviceWorker';
 import {JitsiManager} from "./utils/JitsiManager";
 import {Alert, CircularProgress } from '@mui/material';
 import { CenteredBox } from './components';
+import {Helmet} from "react-helmet";
+
+declare global {
+    interface Window {
+        pdimp: any;
+    }
+}
+window.pdimp = {};
 
 console.log('[process.env.REACT_APP_DISABLE_LIVE_RELOAD]: ', process.env.REACT_APP_DISABLE_LIVE_RELOAD);
 if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
@@ -29,6 +37,9 @@ const root = document.getElementById('root');
 ReactDOM.render(
     (
         <React.StrictMode>
+            <Helmet>
+                <title>{`Loading | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
+            </Helmet>
             <CenteredBox>
                 <CircularProgress/>
             </CenteredBox>
@@ -42,6 +53,9 @@ JitsiManager.loadExternalApi()
         ReactDOM.render(
             (
                 <React.StrictMode>
+                    <Helmet>
+                        <title>{process.env.REACT_APP_DOCUMENT_TITLE_BASE}</title>
+                    </Helmet>
                     <Provider store={store}>
                         <App/>
                     </Provider>
@@ -54,6 +68,9 @@ JitsiManager.loadExternalApi()
         ReactDOM.render(
             (
                 <React.StrictMode>
+                    <Helmet>
+                        <title>{`Error | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
+                    </Helmet>
                     <CenteredBox>
                         <Alert severity="error">Jitsi could not load correctly!</Alert>
                     </CenteredBox>
@@ -62,6 +79,11 @@ JitsiManager.loadExternalApi()
             root
         );
     })
+
+// eslint-disable-next-line no-self-compare
+// if ('DEBUG' === 'DEBUG') {
+//     (window as any).pdimp = {};
+// }
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

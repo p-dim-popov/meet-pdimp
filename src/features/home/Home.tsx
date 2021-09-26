@@ -39,7 +39,7 @@ export const Home: React.FC = () => {
 
     const onSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event?.preventDefault?.();
-        const _roomName = roomName || generatedRoomName;
+        const _roomName = (roomName || generatedRoomName).replaceAll(' ', '_');
         history.push(`/${_roomName}`)
     }, [generatedRoomName, history, roomName]);
 
@@ -47,9 +47,8 @@ export const Home: React.FC = () => {
         <form onSubmit={onSubmit}>
             <CenteredBox>
                     <FormControl focused>
-                        <InputLabel htmlFor="component-outlined">Name</InputLabel>
+                        <InputLabel>Conference Name</InputLabel>
                         <FilledInput
-                            id="component-filled"
                             value={roomName}
                             onChange={(e) => setRoomName(e.target.value)}
                             placeholder={placeholder}
