@@ -4,6 +4,7 @@ import {InviteDialog} from "../../components";
 import {CircularProgress, Dialog, DialogContent} from "@mui/material";
 import {useAppDispatch, useAppSelector, useListenForJitsiExternalApiEvent} from "../../app/hooks";
 import {conferenceSlice, ConferenceStatus, createConferenceAsync, selectConference} from "../../app/conferenceSlice";
+import {Helmet} from 'react-helmet';
 
 export interface IRouteParams {
     roomName: string;
@@ -45,6 +46,9 @@ export const Room: React.FC = () => {
 
     return (
         <>
+            <Helmet>
+                <title>{`${params.roomName} | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
+            </Helmet>
             <InviteDialog isOpen={isInviteDialogOpen} setIsInviteDialogOpen={setIsInviteDialogOpen} />
             <Dialog open={conference.status !== ConferenceStatus.Idle}>
                 <DialogContent>

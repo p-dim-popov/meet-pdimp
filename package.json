@@ -1,10 +1,10 @@
 {
   "name": "meet-pdimp",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "author": {
-    "name" : "Peter Popov",
-    "email" : "p.dim.popov@gmail.com"
+    "name": "Peter Popov",
+    "email": "p.dim.popov@gmail.com"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "random-word-slugs": "^0.0.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-helmet": "^6.1.0",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
@@ -59,6 +60,7 @@
     "yarn": "^1.22"
   },
   "devDependencies": {
+    "@types/react-helmet": "^6.1.2",
     "@types/react-router-dom": "^5.1.9"
   },
   "os": [

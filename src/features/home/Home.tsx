@@ -47,9 +47,8 @@ export const Home: React.FC = () => {
         <form onSubmit={onSubmit}>
             <CenteredBox>
                     <FormControl focused>
-                        <InputLabel htmlFor="component-outlined">Name</InputLabel>
+                        <InputLabel>Conference Name</InputLabel>
                         <FilledInput
-                            id="component-filled"
                             value={roomName}
                             onChange={(e) => setRoomName(e.target.value)}
                             placeholder={placeholder}
