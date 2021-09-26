@@ -11,6 +11,7 @@ git checkout -b dist || (git branch -D dist && git checkout -b dist)
 
 VERSION="$(node -pe "require('./package.json').version")"
 
+yarn install
 echo "Building release for version $VERSION"
 yarn run build
 
