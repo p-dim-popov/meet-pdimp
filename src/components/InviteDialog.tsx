@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Dialog, DialogContent, DialogContentText, DialogTitle, FilledInput, Popover} from "@mui/material";
+import {Dialog, DialogContent, DialogTitle, FilledInput, Popover} from "@mui/material";
 import {copyPlaintext} from "../utils/strings";
 import styled from "@emotion/styled";
 
@@ -38,40 +38,38 @@ export const InviteDialog: React.FC<IProps> = (props) => {
         >
             <DialogTitle>Invite people to join</DialogTitle>
             <DialogContent>
-                <DialogContentText id="alert-dialog-description" >
-                    <StyledPopover
-                        open={openedCopySuccess}
-                        onClose={() => setCopyCopyAnchorEl(null)}
-                        anchorOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right',
-                        }}
-                        transformOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'center',
-                        }}
-                        anchorEl={copyAnchorEl}
-                    >
-                        Copied!
-                    </StyledPopover>
-                    <StyledInviteCodeBox
-                        readOnly
-                        value={inviteLink}
-                        hiddenLabel
-                        fullWidth
-                        componentsProps={{
-                            input: {
-                                onClick: async (event) => {
-                                    const target = event.target as HTMLInputElement;
-                                    const isSuccess = await copyPlaintext(inviteLink);
-                                    if (isSuccess) {
-                                        setCopyCopyAnchorEl(target);
-                                    }
+                <StyledPopover
+                    open={openedCopySuccess}
+                    onClose={() => setCopyCopyAnchorEl(null)}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    anchorEl={copyAnchorEl}
+                >
+                    Copied!
+                </StyledPopover>
+                <StyledInviteCodeBox
+                    readOnly
+                    value={inviteLink}
+                    hiddenLabel
+                    fullWidth
+                    componentsProps={{
+                        input: {
+                            onClick: async (event) => {
+                                const target = event.target as HTMLInputElement;
+                                const isSuccess = await copyPlaintext(inviteLink);
+                                if (isSuccess) {
+                                    setCopyCopyAnchorEl(target);
                                 }
                             }
-                        }}
-                    />
-                </DialogContentText>
+                        }
+                    }}
+                />
             </DialogContent>
         </Dialog>
     )

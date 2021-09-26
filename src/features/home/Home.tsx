@@ -39,7 +39,7 @@ export const Home: React.FC = () => {
 
     const onSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
         event?.preventDefault?.();
-        const _roomName = roomName || generatedRoomName;
+        const _roomName = (roomName || generatedRoomName).replaceAll(' ', '_');
         history.push(`/${_roomName}`)
     }, [generatedRoomName, history, roomName]);
 

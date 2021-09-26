@@ -9,6 +9,13 @@ import {JitsiManager} from "./utils/JitsiManager";
 import {Alert, CircularProgress } from '@mui/material';
 import { CenteredBox } from './components';
 
+declare global {
+    interface Window {
+        pdimp: any;
+    }
+}
+window.pdimp = {};
+
 console.log('[process.env.REACT_APP_DISABLE_LIVE_RELOAD]: ', process.env.REACT_APP_DISABLE_LIVE_RELOAD);
 if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
     const WS = window.WebSocket;
@@ -62,6 +69,11 @@ JitsiManager.loadExternalApi()
             root
         );
     })
+
+// eslint-disable-next-line no-self-compare
+// if ('DEBUG' === 'DEBUG') {
+//     (window as any).pdimp = {};
+// }
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

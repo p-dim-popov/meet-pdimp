@@ -1,61 +1,56 @@
-import React, {useEffect, useState} from "react";
-import {JitsiManager} from "../../utils/JitsiManager";
+import React, {useCallback, useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {InviteDialog} from "../../components";
+import {CircularProgress, Dialog, DialogContent} from "@mui/material";
+import {useAppDispatch, useAppSelector, useListenForJitsiExternalApiEvent} from "../../app/hooks";
+import {conferenceSlice, ConferenceStatus, createConferenceAsync, selectConference} from "../../app/conferenceSlice";
 
 export interface IRouteParams {
     roomName: string;
 }
 
-const useJitsiExternalApi = (roomName: string, handlers: { [key: string]: Function } = {}) => {
+export const Room: React.FC = () => {
+    const conference = useAppSelector(selectConference);
+    const params = useParams<IRouteParams>();
     const history = useHistory();
+    const dispatch = useAppDispatch();
+    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+
+    useListenForJitsiExternalApiEvent('readyToClose', useCallback(() => {
+        console.log('[pdimp]: Redirecting to home');
+        dispatch(conferenceSlice.actions.exit());
+        history.push('/');
+    }, [dispatch, history]));
+
+    useListenForJitsiExternalApiEvent('toolbarButtonClicked', useCallback(({ key }: { key: string }) => {
+        switch (key) {
+            case 'invite':
+                setIsInviteDialogOpen(true);
+                break;
+            case 'participants-pane':
+                alert('opened participants-pane')
+        }
+    }, []));
 
     useEffect(() => {
-        console.log('[Room]: Mounting/Changing room!', roomName)
-        if (!roomName) return;
-
-        const _roomName = `pdimp_${encodeURIComponent(roomName)}_pdimp`;
-        console.log('[Room]: Room name ->', _roomName);
-        const api = new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, JitsiManager.getExternalApiOptions(_roomName));
-        Object.entries(handlers).forEach(([key, value]) => api.addEventListener(key, value))
-        return () => {
-            console.log('[Room]: Unmounting/Room changing!')
-            api?.dispose?.();
-            Object.entries(handlers).forEach(([key, value]) => api.removeEventListener(key, value))
+        switch (conference.status) {
+            case ConferenceStatus.None:
+                dispatch(createConferenceAsync({ roomName: params.roomName }));
+                break;
+            case ConferenceStatus.Loading:
+            case ConferenceStatus.Idle:
+                break;
         }
-    }, [handlers, history, roomName])
-}
+    }, [conference.status, dispatch, params.roomName])
 
-export const Room: React.FC = () => {
-    const { roomName } = useParams<IRouteParams>();
-    const history = useHistory();
-    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-    const [handlers] = useState({
-        readyToClose: () => {
-            console.log('[Room]: Redirecting to home')
-            history.push('/');
-        },
-        toolbarButtonClicked: ({ key }: { key: string }) => {
-            switch (key) {
-                case 'invite':
-                    setIsInviteDialogOpen(true);
-                    break;
-            }
-        },
-    });
-
-    useJitsiExternalApi(roomName, handlers);
-
-    if (!roomName) {
-        return <>Not in a room</>;
-    }
     return (
         <>
             <InviteDialog isOpen={isInviteDialogOpen} setIsInviteDialogOpen={setIsInviteDialogOpen} />
-            <div
-                style={{width: '100vw', height: '100vh', maxWidth: '100%', overflow: "hidden"}}
-                id="meet"
-            />
+            <Dialog open={conference.status !== ConferenceStatus.Idle}>
+                <DialogContent>
+                    <CircularProgress />
+                </DialogContent>
+            </Dialog>
         </>
     );
 };
