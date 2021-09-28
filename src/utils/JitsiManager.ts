@@ -1386,7 +1386,7 @@ class JitsiManagerClass {
 
     getExternalApiOptions(roomName: string, onload?: Function) {
         return {
-            roomName,
+            roomName: `${roomName} | pdimp`,
             width: '100%',
             height: '100%',
             parentNode: document.getElementById('jitsi-meet'),
