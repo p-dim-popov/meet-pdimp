@@ -1,10 +1,17 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
-import {InviteDialog} from "../../components";
+import {InviteDialog, ParticipantsDialog} from "../../components";
 import {CircularProgress, Dialog, DialogContent} from "@mui/material";
 import {useAppDispatch, useAppSelector, useListenForJitsiExternalApiEvent} from "../../app/hooks";
-import {conferenceSlice, ConferenceStatus, createConferenceAsync, selectConference} from "../../app/conferenceSlice";
+import {
+    conferenceSlice,
+    ConferenceStatus,
+    createConferenceAsync,
+    ParticipantsDisplayType,
+    selectConference
+} from "../../app/conferenceSlice";
 import {Helmet} from 'react-helmet';
+import {JitsiExternalApiConferences} from "../JitsiExternalApiConference";
 
 export interface IRouteParams {
     roomName: string;
@@ -15,7 +22,8 @@ export const Room: React.FC = () => {
     const params = useParams<IRouteParams>();
     const history = useHistory();
     const dispatch = useAppDispatch();
-    const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+    const [isInviteDialogOpen, toggleInviteDialog] = useState(false);
+    const [isParticipantsDialogOpen, toggleParticipantsDialog] = useState(false);
 
     useListenForJitsiExternalApiEvent('readyToClose', useCallback(() => {
         console.log('[pdimp]: Redirecting to home');
@@ -26,12 +34,16 @@ export const Room: React.FC = () => {
     useListenForJitsiExternalApiEvent('toolbarButtonClicked', useCallback(({ key }: { key: string }) => {
         switch (key) {
             case 'invite':
-                setIsInviteDialogOpen(true);
+                toggleInviteDialog(true);
                 break;
             case 'participants-pane':
-                alert('opened participants-pane')
+                toggleParticipantsDialog(true);
         }
     }, []));
+
+    useListenForJitsiExternalApiEvent('tileViewChanged', useCallback(({ enabled }: { enabled: boolean }) => {
+        dispatch(conferenceSlice.actions.setDisplay({ type: enabled ? ParticipantsDisplayType.Tiled : ParticipantsDisplayType.NonTiled }))
+    }, [dispatch]))
 
     useEffect(() => {
         switch (conference.status) {
@@ -49,7 +61,10 @@ export const Room: React.FC = () => {
             <Helmet>
                 <title>{`${params.roomName} | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
             </Helmet>
-            <InviteDialog isOpen={isInviteDialogOpen} setIsInviteDialogOpen={setIsInviteDialogOpen} />
+            <InviteDialog open={isInviteDialogOpen} toggle={toggleInviteDialog} />
+            {(conference.mainConferenceIndex !== null) && (conference.status === ConferenceStatus.Idle) && (JitsiExternalApiConferences[conference.mainConferenceIndex].loaded) && (
+                <ParticipantsDialog open={isParticipantsDialogOpen} toggle={toggleParticipantsDialog} conferenceKey={conference.mainConferenceIndex} />
+            )}
             <Dialog open={conference.status !== ConferenceStatus.Idle}>
                 <DialogContent>
                     <CircularProgress />

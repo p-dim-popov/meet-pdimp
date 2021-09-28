@@ -4,8 +4,8 @@ import {copyPlaintext} from "../utils/strings";
 import styled from "@emotion/styled";
 
 interface IProps {
-    isOpen: boolean;
-    setIsInviteDialogOpen: (state: boolean) => void;
+    open: boolean;
+    toggle: (state: boolean) => void;
 }
 
 const StyledPopover = styled(Popover)`
@@ -31,8 +31,8 @@ export const InviteDialog: React.FC<IProps> = (props) => {
 
     return (
         <Dialog
-            open={props.isOpen}
-            onClose={() => props.setIsInviteDialogOpen(false)}
+            open={props.open}
+            onClose={() => props.toggle(false)}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >

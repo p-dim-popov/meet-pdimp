@@ -10,16 +10,31 @@ export enum ConferenceStatus {
     Failed = 'failed',
 }
 
+export enum ParticipantsDisplayType {
+    Tiled = 'tiled',
+    NonTiled = 'non-tiled',
+    Pinned = 'pinned',
+}
+
+export interface ParticipantsDisplay {
+    type: ParticipantsDisplayType;
+    value?: string;
+}
+
 export interface ConferenceState {
     status: ConferenceStatus;
     capturedEvents: { [key: string]: any[] };
     mainConferenceIndex: number|null;
+    participantsDisplay: ParticipantsDisplay;
 }
 
 const initialState: ConferenceState = {
     status: ConferenceStatus.None,
     capturedEvents: {},
     mainConferenceIndex: null,
+    participantsDisplay: {
+        type: ParticipantsDisplayType.NonTiled,
+    }
 };
 
 export enum ConferenceErrorType {
@@ -48,14 +63,6 @@ export const createConferenceAsync = createAsyncThunk<
         }
     }
 );
-
-// const unregisterHandlers = (state: ConferenceState) => {
-//     state.handlers.forEach((handlers, eventName) => {
-//         handlers?.forEach?.((handler) => {
-//             state.api.removeEventListener(eventName, handler)
-//         })
-//     })
-// }
 
 const ensureClearedJitsiMeetDivIsInBody = () => {
     const jitsiMeetDiv = Object.assign(
@@ -94,6 +101,13 @@ export const conferenceSlice = createSlice({
             state.mainConferenceIndex = null;
             ensureClearedJitsiMeetDivIsInBody();
         },
+        setDisplay: (state, action: PayloadAction<ParticipantsDisplay>) => {
+            if (state.participantsDisplay.type === ParticipantsDisplayType.Pinned && action.payload.type === ParticipantsDisplayType.NonTiled) {
+                state.participantsDisplay.type = ParticipantsDisplayType.NonTiled;
+            } else {
+                state.participantsDisplay = action.payload;
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -138,11 +152,20 @@ export const listenFor = (eventName: string): AppThunk => async (dispatch, getSt
     if (JitsiExternalApiConferences[mainConferenceIndex].listeners.has(eventName)) return;
 
     const listener = JitsiExternalApiConferences[mainConferenceIndex]?.listeners
-        ?.set?.(eventName, (...args: any) => dispatch(conferenceSlice.actions.on({eventName, args})))
-        ?.get?.(eventName);
+        .set(eventName, (...args: any) => dispatch(conferenceSlice.actions.on({eventName, args})))
+        .get(eventName);
     api.addEventListener(eventName, listener)
 }
 
 export const selectConference = (state: RootState) => state.conference;
+
+export const selectIsParticipantPinned = (id: string) => (state: RootState) => state.conference.participantsDisplay.value === id;
+
+export const selectEventListByName = (eventName: string) => (state: RootState) => state.conference.capturedEvents[eventName] || [];
+
+export const selectLastEventOfType = (eventName: string) => (state: RootState) => {
+    const eventList = selectEventListByName(eventName)(state);
+    return !!eventList.length ? eventList[eventList.length - 1] :  null;
+}
 
 export default conferenceSlice.reducer;

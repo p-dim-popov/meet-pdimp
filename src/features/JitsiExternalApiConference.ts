@@ -8,7 +8,7 @@ export class JitsiExternalApiConference {
     setPromise = (promise: Promise<any>) => {
         this._promise = promise.then((r) => {
             this._resolvedPromiseData = r;
-            // this._promise = null;
+            this._promise = null;
             return this._instance;
         });
     }
@@ -39,5 +39,4 @@ export class JitsiExternalApiConference {
 
 export const JitsiExternalApiConferences: JitsiExternalApiConference[] = new Array<JitsiExternalApiConference>();
 
-// @ts-ignore
-window.pdimpJitsiExternalApiConferences = JitsiExternalApiConferences;
+window.pdimp.JitsiExternalApiConferences = JitsiExternalApiConferences;

@@ -17,7 +17,6 @@ declare global {
         pdimp: any;
     }
 }
-window.pdimp = {};
 
 console.log('[process.env.REACT_APP_DISABLE_LIVE_RELOAD]: ', process.env.REACT_APP_DISABLE_LIVE_RELOAD);
 if (process.env.REACT_APP_DISABLE_LIVE_RELOAD === '1') {
