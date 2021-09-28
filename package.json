@@ -36,7 +36,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "release": "./release.sh",
+    "release": ". ./release.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
