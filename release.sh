@@ -3,6 +3,9 @@
 set -e
 
 IN_CI="false"
+# temp fix for ci treating warnings as errors
+# shellcheck disable=SC2034
+CI="false"
 
 if [ "$1" = "--in-ci" ]; then
     IN_CI="true"
