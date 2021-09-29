@@ -4,8 +4,7 @@ set -e
 
 IN_CI="false"
 # temp fix for ci treating warnings as errors
-# shellcheck disable=SC2034
-CI="false"
+unset CI
 
 if [ "$1" = "--in-ci" ]; then
     IN_CI="true"
@@ -19,13 +18,19 @@ if [ "$IN_CI" = "false" ]; then
   git checkout main
 fi
 
-git checkout -b dist || (git branch -D dist && git checkout -b dist)
+yarn install
+
+# first build to check for errors
+yarn run build
+
+semantic-release
 
 VERSION="$(node -pe "require('./package.json').version")"
-
-yarn install
 echo "Building release for version $VERSION"
+# then run actual build after semantic-release; fix later
 yarn run build
+
+git checkout -b dist || (git branch -D dist && git checkout -b dist)
 
 for file in $(git ls-files); do
 	if [ "$file" = ".gitignore" ] || [ "$file" = "release.sh" ]; then
