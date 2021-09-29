@@ -12,4 +12,10 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - run: yarn run release
+      - run: yarn run release --in-ci
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          branch: dist
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
