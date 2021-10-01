@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/p-dim-popov/meet-pdimp/compare/v1.0.0...v1.1.0) (2021-10-01)
+
+
+### Features
+
+* **Home:** add title and logo to home screen, re-create iframe for each conference ([0794de1](https://github.com/p-dim-popov/meet-pdimp/commit/0794de1e4e84311831d68781fa78686ccf7ee5e4))
+
 # 1.0.0 (2021-09-29)
 
 
