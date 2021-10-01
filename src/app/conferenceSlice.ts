@@ -24,14 +24,14 @@ export interface ParticipantsDisplay {
 export interface ConferenceState {
     status: ConferenceStatus;
     capturedEvents: { [key: string]: any[] };
-    mainConferenceIndex: number|null;
+    mainConferenceKey: string|null;
     participantsDisplay: ParticipantsDisplay;
 }
 
 const initialState: ConferenceState = {
     status: ConferenceStatus.None,
     capturedEvents: {},
-    mainConferenceIndex: null,
+    mainConferenceKey: null,
     participantsDisplay: {
         type: ParticipantsDisplayType.NonTiled,
     }
@@ -57,7 +57,7 @@ export const createConferenceAsync = createAsyncThunk<
     }>(
     'conference/create',
     async ({ roomName }, thunkAPI) => {
-        const conferenceIndex = thunkAPI.getState().conference.mainConferenceIndex;
+        const conferenceIndex = thunkAPI.getState().conference.mainConferenceKey;
         if (conferenceIndex) {
             await JitsiExternalApiConferences[conferenceIndex]?.get?.();
         }
@@ -75,13 +75,13 @@ export const conferenceSlice = createSlice({
             state.capturedEvents[action.payload.eventName].push(action.payload.args);
         },
         exit: (state) => {
-            if (state.mainConferenceIndex === null) return;
+            if (state.mainConferenceKey === null) return;
 
-            JitsiExternalApiConferences[state.mainConferenceIndex].dispose();
-            JitsiExternalApiConferences.splice(state.mainConferenceIndex, 1);
+            JitsiExternalApiConferences[state.mainConferenceKey].dispose();
+            delete JitsiExternalApiConferences[state.mainConferenceKey];
             state.status = ConferenceStatus.None;
             state.capturedEvents = {};
-            state.mainConferenceIndex = null;
+            state.mainConferenceKey = null;
         },
         setDisplay: (state, action: PayloadAction<ParticipantsDisplay>) => {
             if (state.participantsDisplay.type === ParticipantsDisplayType.Pinned && action.payload.type === ParticipantsDisplayType.NonTiled) {
@@ -95,18 +95,13 @@ export const conferenceSlice = createSlice({
         builder
             .addCase(createConferenceAsync.pending, (state, action) => {
                 // Check this if we want only one conference to exist;
-                if (state.mainConferenceIndex !== null) return;
+                if (state.mainConferenceKey !== null) return;
 
-                state.mainConferenceIndex = JitsiExternalApiConferences.push(new JitsiExternalApiConference(`JitsiExternalApiConference_${state.mainConferenceIndex}_${Date.now()}`)) - 1;
-                JitsiExternalApiConferences[state.mainConferenceIndex].setPromise(
-                        new Promise((resolve, reject) => {
-                            if (state.mainConferenceIndex === null) {
-                                return reject('[pdimp]: Main conference index is null!');
-                            }
-
-                            const jeac = JitsiExternalApiConferences?.[state.mainConferenceIndex];
-                            const options = JitsiManager.getExternalApiOptions(action.meta.arg.roomName, jeac.id, resolve);
-                            jeac?.setInstance(new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, options));
+                const jeac = new JitsiExternalApiConference();
+                state.mainConferenceKey = jeac.id;
+                jeac.setPromise(new Promise((resolve) => {
+                    const options = JitsiManager.getExternalApiOptions(action.meta.arg.roomName, jeac.id, resolve);
+                    jeac.setInstance(new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, options));
                 }));
 
                 state.status = ConferenceStatus.Loading;
@@ -121,16 +116,16 @@ export const conferenceSlice = createSlice({
 })
 
 export const listenFor = (eventName: string): AppThunk => async (dispatch, getState) => {
-    const {conference: {mainConferenceIndex}} = getState();
-    if (mainConferenceIndex === null) return;
+    const {conference: {mainConferenceKey}} = getState();
+    if (mainConferenceKey === null) return;
 
-    if (!JitsiExternalApiConferences[mainConferenceIndex]) return;
+    if (!JitsiExternalApiConferences[mainConferenceKey]) return;
 
-    const api = await JitsiExternalApiConferences[mainConferenceIndex].get();
+    const api = await JitsiExternalApiConferences[mainConferenceKey].get();
 
-    if (JitsiExternalApiConferences[mainConferenceIndex].listeners.has(eventName)) return;
+    if (JitsiExternalApiConferences[mainConferenceKey].listeners.has(eventName)) return;
 
-    const listener = JitsiExternalApiConferences[mainConferenceIndex]?.listeners
+    const listener = JitsiExternalApiConferences[mainConferenceKey]?.listeners
         .set(eventName, (...args: any) => dispatch(conferenceSlice.actions.on({eventName, args})))
         .get(eventName);
     api.addEventListener(eventName, listener)

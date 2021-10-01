@@ -13,7 +13,7 @@ export const useListenForJitsiExternalApiEvent = (eventName: string, memoizedCal
     const dispatch = useAppDispatch();
     const conference = useAppSelector(selectConference);
 
-    const apiConference = conference.mainConferenceIndex !== null ? JitsiExternalApiConferences[conference.mainConferenceIndex] : null;
+    const apiConference = conference.mainConferenceKey !== null ? JitsiExternalApiConferences[conference.mainConferenceKey] : null;
     const apiConferenceListeners = apiConference?.listeners;
     const apiConferenceListenersHasEvent = apiConferenceListeners?.has?.(eventName);
     if (!conference.capturedEvents[eventName] && (!!apiConference && !apiConferenceListenersHasEvent)) {

@@ -62,8 +62,8 @@ export const Room: React.FC = () => {
                 <title>{`${params.roomName} | ${process.env.REACT_APP_DOCUMENT_TITLE_BASE}`}</title>
             </Helmet>
             <InviteDialog open={isInviteDialogOpen} toggle={toggleInviteDialog} />
-            {(conference.mainConferenceIndex !== null) && (conference.status === ConferenceStatus.Idle) && (JitsiExternalApiConferences[conference.mainConferenceIndex].loaded) && (
-                <ParticipantsDialog open={isParticipantsDialogOpen} toggle={toggleParticipantsDialog} conferenceKey={conference.mainConferenceIndex} />
+            {(conference.mainConferenceKey !== null) && (conference.status === ConferenceStatus.Idle) && (JitsiExternalApiConferences[conference.mainConferenceKey].loaded) && (
+                <ParticipantsDialog open={isParticipantsDialogOpen} toggle={toggleParticipantsDialog} conferenceKey={conference.mainConferenceKey} />
             )}
             <Dialog open={conference.status !== ConferenceStatus.Idle}>
                 <DialogContent>

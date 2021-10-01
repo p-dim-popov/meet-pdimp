@@ -6,7 +6,7 @@ export class JitsiExternalApiConference {
     private _instance: any;
     private readonly _id: string;
 
-    constructor(id: string) {
+    constructor(id: string = `jeac_${Date.now()}`, storage?: typeof JitsiExternalApiConferences) {
         this._id = id;
         const jitsiMeetDiv = document.createElement('div') as HTMLDivElement;
         jitsiMeetDiv.id = id;
@@ -15,6 +15,10 @@ export class JitsiExternalApiConference {
         jitsiMeetDiv.style.maxWidth = '100%';
         jitsiMeetDiv.style.overflow = "hidden";
         document.body.appendChild(jitsiMeetDiv);
+
+        if (!storage) {
+            JitsiExternalApiConferences[this._id] = this;
+        }
 
         window.pdimp[id] = this;
     }
@@ -48,14 +52,17 @@ export class JitsiExternalApiConference {
     }
 
     dispose = async () => {
+        console.log('[pdimp/JitsiExternalApiConference/dispose]: Start');
         await this._instance.dispose();
+        console.log('[pdimp/JitsiExternalApiConference/dispose]: Remove listeners');
         this.listeners.forEach((handler, eventName) => {
             this._instance.removeEventListener(eventName, handler);
         })
         document.getElementById(this.id)?.remove();
+        console.log('[pdimp/JitsiExternalApiConference/dispose]: Remove from window');
+        delete window.pdimp[this.id];
     }
 }
 
-export const JitsiExternalApiConferences: JitsiExternalApiConference[] = new Array<JitsiExternalApiConference>();
-
+export const JitsiExternalApiConferences: { [id: string]: JitsiExternalApiConference } = {};
 window.pdimp.JitsiExternalApiConferences = JitsiExternalApiConferences;

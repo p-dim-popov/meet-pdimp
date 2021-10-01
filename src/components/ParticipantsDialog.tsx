@@ -13,7 +13,7 @@ import { JitsiExternalApiContext } from "../contexts";
 export interface IProps {
     open: boolean;
     toggle: (open: boolean) => void;
-    conferenceKey: number;
+    conferenceKey: string;
 }
 
 export const ParticipantsDialog: React.FC<IProps> = (props) => {
