@@ -1,8 +1,18 @@
 import React, {FormEvent, useCallback, useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
-import {FilledInput, FormControl, InputLabel, Button} from "@mui/material";
+import {FilledInput, FormControl, InputLabel, Button, Typography} from "@mui/material";
 import {generateSlug} from "random-word-slugs";
 import {CenteredBox} from "../../components";
+import {ReactComponent as HomeLogo} from '../../resources/blogging.svg';
+import styled from "@emotion/styled";
+
+const StyledHomeLogo = styled(HomeLogo)`
+    max-height: 50vh;
+`;
+
+const StyledButton = styled(Button)`
+    margin: 10px;
+`;
 
 export const Home: React.FC = () => {
     const history = useHistory();
@@ -44,9 +54,14 @@ export const Home: React.FC = () => {
     }, [generatedRoomName, history, roomName]);
 
     return (
-        <form onSubmit={onSubmit}>
-            <CenteredBox>
-                    <FormControl focused>
+        <>
+            <form onSubmit={onSubmit}>
+                <CenteredBox>
+                    <Typography variant="h2" gutterBottom component="div" textAlign="center" >
+                        Peter Popov's Conference App
+                    </Typography>
+                    <StyledHomeLogo />
+                    <FormControl focused margin="dense">
                         <InputLabel>Conference Name</InputLabel>
                         <FilledInput
                             value={roomName}
@@ -54,8 +69,9 @@ export const Home: React.FC = () => {
                             placeholder={placeholder}
                         />
                     </FormControl>
-                    <Button variant="contained" type="submit" >Start meeting</Button>
-            </CenteredBox>
-        </form>
+                    <StyledButton variant="contained" type="submit">Start meeting</StyledButton>
+                </CenteredBox>
+            </form>
+        </>
     )
 };

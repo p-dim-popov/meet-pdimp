@@ -4,6 +4,24 @@ export class JitsiExternalApiConference {
     private _resolvedPromiseData: any;
     private _promise?: Promise<any>|null;
     private _instance: any;
+    private readonly _id: string;
+
+    constructor(id: string) {
+        this._id = id;
+        const jitsiMeetDiv = document.createElement('div') as HTMLDivElement;
+        jitsiMeetDiv.id = id;
+        jitsiMeetDiv.style.width = '100vw';
+        jitsiMeetDiv.style.height = '100vh';
+        jitsiMeetDiv.style.maxWidth = '100%';
+        jitsiMeetDiv.style.overflow = "hidden";
+        document.body.appendChild(jitsiMeetDiv);
+
+        window.pdimp[id] = this;
+    }
+
+    get id() {
+        return this._id;
+    }
 
     setPromise = (promise: Promise<any>) => {
         this._promise = promise.then((r) => {
@@ -29,11 +47,12 @@ export class JitsiExternalApiConference {
         this._instance = value;
     }
 
-    dispose = () => {
-        this._instance.dispose();
+    dispose = async () => {
+        await this._instance.dispose();
         this.listeners.forEach((handler, eventName) => {
             this._instance.removeEventListener(eventName, handler);
         })
+        document.getElementById(this.id)?.remove();
     }
 }
 

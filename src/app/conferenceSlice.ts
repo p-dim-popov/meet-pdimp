@@ -64,23 +64,6 @@ export const createConferenceAsync = createAsyncThunk<
     }
 );
 
-const ensureClearedJitsiMeetDivIsInBody = () => {
-    const jitsiMeetDiv = Object.assign(
-        document.getElementById('jitsi-meet') ?? document.createElement('div'), {
-            id: 'jitsi-meet',
-            innerHTML: '',
-        } as HTMLDivElement);
-
-    jitsiMeetDiv.style.width = '100vw';
-    jitsiMeetDiv.style.height = '100vh';
-    jitsiMeetDiv.style.maxWidth = '100%';
-    jitsiMeetDiv.style.overflow = "hidden";
-
-    if (!document.body.contains(jitsiMeetDiv)) {
-        document.body.appendChild(jitsiMeetDiv);
-    }
-}
-
 export const conferenceSlice = createSlice({
     name: 'conference',
     initialState,
@@ -99,7 +82,6 @@ export const conferenceSlice = createSlice({
             state.status = ConferenceStatus.None;
             state.capturedEvents = {};
             state.mainConferenceIndex = null;
-            ensureClearedJitsiMeetDivIsInBody();
         },
         setDisplay: (state, action: PayloadAction<ParticipantsDisplay>) => {
             if (state.participantsDisplay.type === ParticipantsDisplayType.Pinned && action.payload.type === ParticipantsDisplayType.NonTiled) {
@@ -115,19 +97,16 @@ export const conferenceSlice = createSlice({
                 // Check this if we want only one conference to exist;
                 if (state.mainConferenceIndex !== null) return;
 
-                ensureClearedJitsiMeetDivIsInBody();
-
-                state.mainConferenceIndex = JitsiExternalApiConferences.push(new JitsiExternalApiConference()) - 1;
+                state.mainConferenceIndex = JitsiExternalApiConferences.push(new JitsiExternalApiConference(`JitsiExternalApiConference_${state.mainConferenceIndex}_${Date.now()}`)) - 1;
                 JitsiExternalApiConferences[state.mainConferenceIndex].setPromise(
                         new Promise((resolve, reject) => {
-                            const options = JitsiManager.getExternalApiOptions(action.meta.arg.roomName, resolve);
-
                             if (state.mainConferenceIndex === null) {
                                 return reject('[pdimp]: Main conference index is null!');
                             }
 
-                            JitsiExternalApiConferences?.[state.mainConferenceIndex]
-                                ?.setInstance(new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, options));
+                            const jeac = JitsiExternalApiConferences?.[state.mainConferenceIndex];
+                            const options = JitsiManager.getExternalApiOptions(action.meta.arg.roomName, jeac.id, resolve);
+                            jeac?.setInstance(new JitsiManager.ExternalApiClass(JitsiManager.DOMAIN, options));
                 }));
 
                 state.status = ConferenceStatus.Loading;
